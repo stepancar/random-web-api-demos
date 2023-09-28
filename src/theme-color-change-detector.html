@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="theme-color" content="#ffffff">
+    <title>Theme Color Change Detector</title>
+    <style>
+        .theme-color-change-detector {
+            
+            width: 200px;
+            height: 200px;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <button>Shaffle theme color</button>
+
+    <div class="theme-color-change-detector">
+        This block should have the same background color as the theme color meta tag
+    </div>
+
+    <script type="text/javascript">
+       
+        const button = document.querySelector('button');
+
+        button.addEventListener('click', () => {
+            const themeColorElement = document.querySelector('meta[name="theme-color"]');
+            const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16);
+            themeColorElement.setAttribute('content', randomColor);
+        });
+
+        function subscribeToThemeColorChange(callback) {
+            const themeColorElement = document.querySelector('meta[name="theme-color"]');
+            new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'content') {
+                        callback(mutation.target.getAttribute('content'));
+                    }
+                });
+            }).observe(themeColorElement, { attributes: true });
+            callback(themeColorElement.getAttribute('content'));
+        }
+
+
+        subscribeToThemeColorChange((themeColor) => {
+            // do something
+            document.querySelector('.theme-color-change-detector').style.backgroundColor = themeColor;
+        });
+
+    </script>
+</body>
+</html>
