@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Pixi svg upload experiments</title>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+
+<body>
+    <select id="mode">
+        <option value="image">image</option>
+        <option value="newCanvasForEveryFrame">new Canvas For Every Frame</option>
+        <option value="oneCanvasForAllFrames">one Canvas For All Frames</option>
+    </select>
+
+    <div class="lottieContainer" style="display: none;">
+
+    </div>
+
+    <script src="https://unpkg.com/pixi.js@7.x/dist/pixi.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js" integrity="sha512-jEnuDt6jfecCjthQAJ+ed0MTVA++5ZKmlUcmDGBv2vUI/REn6FuIdixLNnQT+vKusE2hhTk2is3cFvv5wA+Sgg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="index.js" type="text/javascript"></script>
+    
+    <script type="text/javascript">
+
+        async function run() {
+
+            const animationItem = await loadLottieDataAndRunPlayback({ container: document.querySelector('.lottieContainer') });
+            
+            const { Application, Sprite, Assets } = PIXI;
+            
+            const app = new Application({
+                width: 1920,
+                height: 1080,
+                backgroundColor: 0x1099bb,
+                resolution: 1
+            });
+
+            document.body.appendChild(app.view);
+
+            const sprite = new Sprite();
+
+            app.stage.addChild(sprite);
+
+            const modeElement = document.querySelector('#mode');
+            
+            app.ticker.add((time) => {
+                const mode = modeElement.value;
+                console.log(mode);
+                // GO TO createPixiTextureForLottieFrame to SEE HOW WE CAN SPEED TEXTURE UPLOADING 
+                createPixiTextureForLottieFrame(animationItem, mode).then(texture => {
+                    sprite.texture = texture;
+                })
+            });
+        }
+
+        run();
+
+    </script>
+</body>
+
+</html>
