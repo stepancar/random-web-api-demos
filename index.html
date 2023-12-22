@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Font faces check</title>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+    
+</head>
+<body>
+    <script type="text/javascript">
+        Reflect.setPrototypeOf(String.prototype, {
+            get: function(obj) {
+                console.log(obj);
+                return obj[this];
+            }
+        })
+    </script>
+</body>
+</html>

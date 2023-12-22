@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Font faces check</title>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <input id="fontUrl" value="https://fonts.gstatic.com/s/poppins/v20/pxiByp8kv8JHgFVrLGT9Z1xlFd2JQEk.woff2">
+        <input id="fontSize" value="32px">
+        <input id="text" value="Lorem Ipsum">
+        <button id="checkFont">Check font</button>
+        <span id="status"></span>
+        <div id="result"></div>
+    </div>
+    
+    <script type="text/javascript">
+        const buttonElement = document.querySelector('#checkFont');
+        const fontUrlElement = document.querySelector('#fontUrl');
+        const textElement = document.querySelector('#text');
+        const fontSizeElement = document.querySelector('#fontSize');
+        const statusElement = document.querySelector('#status');
+        const resultElement = document.querySelector('#result');
+        const fontFacesFontCheckResultElement = document.querySelector('#fontFacesFontCheckResult');
+
+        buttonElement.addEventListener('click', () => {
+            document.fonts.clear();
+            const fontUrl = fontUrlElement.value;
+            const text = textElement.value;
+            const font = new FontFace('myFont', `url(${fontUrl})`);
+            const fontSize = fontSizeElement.value;
+            setTimeout(() => {
+                font.load().then((loadedFont) => {
+                    document.fonts.add(loadedFont);
+                    // check if text is within the font unicode range
+                    const unicodeRange = font.unicodeRange;
+                    const unicodeStart = parseInt(unicodeRange.split('-')[0].replace('U+', ''), 16);
+                    const unicodeEnd = parseInt(unicodeRange.split('-')[1].replace('U+', ''), 16);
+                    let isWithinRange = true;
+                    
+
+                    const d = document.createElement('div');
+                    d.appendChild(document.createTextNode(text));
+                    d.style.fontFamily = 'myFont';
+                    
+                    console.log(getComputedStyle(d).getPropertyValue('font-family'));
+                    
+                    // if (document.fonts.check(`${fontSize} myFont`, text)) {
+                        resultElement.style.fontFamily = 'myFont2';
+                        resultElement.style.fontSize = fontSize;
+                        
+                    //     statusElement.innerText = 'Font is available';
+                    // } else {
+                    //     statusElement.innerText = 'Font is not available';
+                    // }
+
+                        
+                        var span = document.createElement('span');
+                        span.innerText = text;
+                        resultElement.appendChild(span);
+                        console.log(span.computedStyleMap().get('font-family').toString())
+                    // resultElement.appendChild();
+                });
+            }, 1000); 
+        });
+    </script>
+</body>
+</html>
