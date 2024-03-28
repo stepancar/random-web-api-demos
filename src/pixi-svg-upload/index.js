@@ -90,7 +90,8 @@ async function createPixiTextureFromSvgTheFastest(svg) {
 
 
 async function getLottieData() {
-    const url = 'https://storage.googleapis.com/lumen5-prod-lottie/Origin/Origin-Text9-Land.json'
+    // const url = 'https://storage.googleapis.com/lumen5-prod-lottie/Origin/Origin-Text9-Land.json'
+    const url = 'https://storage.googleapis.com/lumen5-prod-lottie/Magnifique/Text%2001/Landscape/test2.json';
     return fetch(url).then((response) => {
         return response.json();
     });
