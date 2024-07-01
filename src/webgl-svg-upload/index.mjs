@@ -1,18 +1,18 @@
-// START OF IMPORTANT CODE
+import { inlineSVG } from './inlineSvg.mjs';
+import { WebglApp } from './webglApp.mjs';
+
 
 /**
  * This is a main function we try to optimize
  */
-async function createImageSourceForLottieFrame(animationItem, mode) {
-    const svg = animationItem.renderer.svgElement;
-
+async function createImageSourceForSvg(svgElement, mode) {
     switch (mode) {
         case 'image':
-            return await createImageSourceFromSvgVerySlow(svg);
+            return await createImageSourceFromSvgVerySlow(svgElement);
         case 'newCanvasForEveryFrame':
-            return await createImageResourceFromSvgFaster(svg);
+            return await createImageResourceFromSvgFaster(svgElement);
         case 'oneCanvasForAllFrames':
-            return await createImageResourceFromSvgTheFastest(svg);
+            return await createImageResourceFromSvgTheFastest(svgElement);
     }
 }
 
@@ -60,29 +60,6 @@ async function createImageResourceFromSvgTheFastest(svg) {
     return canvas;
 }
 
-// END OF IMPORTANT CODE
-
-async function getLottieData() {
-    // const url = 'https://storage.googleapis.com/lumen5-prod-lottie/Origin/Origin-Text9-Land.json'
-    const url = 'https://storage.googleapis.com/lumen5-prod-lottie/Magnifique/Text%2001/Landscape/test2.json';
-    return fetch(url).then((response) => {
-        return response.json();
-    });
-}
-
-async function loadLottieDataAndRunPlayback({ container }) {
-    const lottieData = await getLottieData();
-
-    const animationItem = lottie.loadAnimation({
-        container,
-        renderer: 'svg',
-        loop: true,
-        autoplay: true,
-        animationData: lottieData
-    });
-
-    return animationItem;
-}
 
 /**
  * We can not pass svg element directly to canvas or to webgl
@@ -101,3 +78,31 @@ async function getImageFromSvg(svgElement) {
         img.src = imageSrc;
     });
 }
+
+
+async function run() {
+    const svgContainer = document.querySelector('#svgContainer');
+
+    const app = new WebglApp({
+        width: 1920,
+        height: 1080,
+    });
+
+    document.body.appendChild(app.canvas);
+    const modeElement = document.querySelector('#mode');
+
+    function tick() {
+        const mode = modeElement.value;
+        const svgElement = svgContainer.querySelector('svg');
+        createImageSourceForSvg(svgElement, mode).then(texture => {
+            app.renderImageSource(texture)
+            requestAnimationFrame(tick);
+        });
+    }
+    
+    inlineSVG('tiger.svg', svgContainer).then(svgElement => {
+        tick();
+    });
+}
+
+run();
