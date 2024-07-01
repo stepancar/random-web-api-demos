@@ -3,7 +3,7 @@
 /**
  * This is a main function we try to optimize
  */
-async function createPixiTextureForLottieFrame(animationItem, mode) {
+async function createImageSourceForLottieFrame(animationItem, mode) {
     const svg = animationItem.renderer.svgElement;
 
     switch (mode) {
@@ -12,7 +12,7 @@ async function createPixiTextureForLottieFrame(animationItem, mode) {
         case 'newCanvasForEveryFrame':
             return await createImageResourceFromSvgFaster(svg);
         case 'oneCanvasForAllFrames':
-            return await createPixiTextureFromSvgTheFastest(svg);
+            return await createImageResourceFromSvgTheFastest(svg);
     }
 }
 
@@ -21,10 +21,7 @@ async function createPixiTextureForLottieFrame(animationItem, mode) {
  * This what we do now - we create a texture based on ImageResource
  */
 async function createImageSourceFromSvgVerySlow(svg) {
-    const img = await getImageFromSvg(svg);
-    const texture = PIXI.Texture.from(img);
-
-    return texture;
+    return await getImageFromSvg(svg);
 }
 
 /**
@@ -40,54 +37,30 @@ async function createImageSourceFromSvgVerySlow(svg) {
     const ctx = canvas.getContext('2d');
     ctx.drawImage(img, 0, 0);
 
-    let texture = PIXI.Texture.from(canvas);
-
-    return texture;
+    return canvas;
 }
 
 
-const canvas = document.createElement('canvas');
-canvas.width = 1920;
-canvas.height = 1080;
-const ctx = canvas.getContext('2d');
-
+let canvas;
 
 /**
  * Faster solution is the same as previous one, but we create canvas only once
  * If you look at perfomance flamegraph you will see that garbage collection of canvas is pretty expensive
  * which makes sense
  */
-async function createPixiTextureFromSvgTheFastest(svg) {
+async function createImageResourceFromSvgTheFastest(svg) {
+    if (!canvas) {
+        canvas = document.createElement('canvas');
+        canvas.width = 1920;
+        canvas.height = 1080;
+    }
     const img = await getImageFromSvg(svg);
-
+    const ctx = canvas.getContext('2d');
     ctx.drawImage(img, 0, 0);
-
-    let texture = PIXI.Texture.from(canvas);
-
-    // this is important, because for the same canvas element pixi will return existing texture
-    // we need to trigger texture uploading
-    texture.update();
-
-    return texture;
+    return canvas;
 }
 
-
 // END OF IMPORTANT CODE
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 async function getLottieData() {
     // const url = 'https://storage.googleapis.com/lumen5-prod-lottie/Origin/Origin-Text9-Land.json'
